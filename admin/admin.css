@@ -196,7 +196,12 @@
 }
 
 .notification-card {
-  padding: 14px 16px;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) 150px minmax(90px, 0.8fr) minmax(140px, 1.2fr) minmax(150px, 1.2fr) minmax(140px, 1.3fr);
+  gap: 14px;
+  align-items: center;
+  padding: 10px 14px;
   border: 1px solid rgba(8, 29, 51, 0.1);
   border-radius: 8px;
   background: rgba(246, 249, 252, 0.96);
@@ -204,56 +209,29 @@
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
 }
 
-.notification-topline {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: baseline;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(8, 29, 51, 0.12);
-}
-
-.notification-topline strong {
+.notification-card strong {
   font-family: "Montserrat", Arial, sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
 }
 
-.notification-topline time {
+.notification-card time {
   color: rgba(8, 29, 51, 0.58);
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.notification-card dl {
-  display: grid;
-  grid-template-columns: 0.85fr 1.15fr 1.2fr;
-  gap: 10px 18px;
-  margin: 12px 0 0;
-}
-
-.notification-card div.wide {
-  grid-column: 1 / -1;
-}
-
-.notification-card dt {
-  color: rgba(8, 29, 51, 0.56);
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
 }
 
-.notification-card dd {
-  margin: 5px 0 0;
-  font-size: 14px;
-  line-height: 1.42;
-  overflow-wrap: anywhere;
-}
-
 .notification-card a {
   color: var(--navy);
   font-weight: 800;
+}
+
+.notification-card > * {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 840px) {
@@ -280,12 +258,13 @@
     width: 190px;
   }
 
-  .notification-card dl,
-  .notification-topline {
+  .notification-card {
     grid-template-columns: 1fr;
+    gap: 6px;
+    white-space: normal;
   }
 
-  .notification-topline {
-    display: grid;
+  .notification-card > * {
+    white-space: nowrap;
   }
 }

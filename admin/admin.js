@@ -68,28 +68,12 @@ function renderClaims(claims) {
     .map(
       (claim) => `
         <article class="notification-card">
-          <div class="notification-topline">
-            <strong>${escapeHtml(claim.name)}</strong>
-            <time datetime="${claim.createdAt}">${formatDate(claim.createdAt)}</time>
-          </div>
-          <dl>
-            <div>
-              <dt>Phone</dt>
-              <dd><a href="tel:${escapeHtml(claim.phone)}">${escapeHtml(claim.phone)}</a></dd>
-            </div>
-            <div>
-              <dt>Email</dt>
-              <dd><a href="mailto:${escapeHtml(claim.email)}">${escapeHtml(claim.email)}</a></dd>
-            </div>
-            <div>
-              <dt>Damage</dt>
-              <dd>${escapeHtml(claim.damage)}</dd>
-            </div>
-            <div class="wide">
-              <dt>Message</dt>
-              <dd>${escapeHtml(claim.message)}</dd>
-            </div>
-          </dl>
+          <strong title="${escapeHtml(claim.name)}">${escapeHtml(claim.name)}</strong>
+          <time datetime="${claim.createdAt}" title="${formatDate(claim.createdAt)}">${formatDate(claim.createdAt)}</time>
+          <a href="tel:${escapeHtml(claim.phone)}" title="${escapeHtml(claim.phone)}">${escapeHtml(claim.phone)}</a>
+          <a href="mailto:${escapeHtml(claim.email)}" title="${escapeHtml(claim.email)}">${escapeHtml(claim.email)}</a>
+          <span title="${escapeHtml(claim.damage)}">${escapeHtml(claim.damage)}</span>
+          <span title="${escapeHtml(claim.message)}">${escapeHtml(claim.message)}</span>
         </article>
       `
     )
