@@ -1,22 +1,23 @@
 .admin-body {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   color: var(--white);
   background:
-    linear-gradient(180deg, rgba(8, 29, 51, 0.96), rgba(6, 21, 37, 0.98)),
+    linear-gradient(180deg, rgba(8, 29, 51, 0.97), rgba(6, 21, 37, 0.98)),
     url("../assets/hero-storm-home.png");
   background-size: cover;
   background-position: center;
 }
 
 .admin-shell {
-  width: min(1120px, calc(100% - 44px));
-  margin: 0 auto;
-  padding: clamp(34px, 6vw, 76px) 0;
+  height: 100vh;
+  width: 100%;
+  padding: 18px;
 }
 
 .admin-login {
   width: min(520px, 100%);
-  margin: 0 auto;
+  margin: min(8vh, 70px) auto 0;
   padding: clamp(24px, 5vw, 42px);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -31,7 +32,7 @@
 
 .admin-login h1,
 .admin-dashboard h1 {
-  font-size: clamp(46px, 7vw, 78px);
+  font-size: clamp(44px, 5.4vw, 72px);
 }
 
 .admin-login-form {
@@ -62,36 +63,54 @@
   line-height: 1.6;
 }
 
-.admin-dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 22px;
-  align-items: flex-start;
-  margin-bottom: 26px;
+.admin-dashboard {
+  height: calc(100vh - 36px);
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 18px;
 }
 
-.admin-actions {
-  display: flex;
-  gap: 10px;
-  padding-top: 8px;
+.admin-sidebar,
+.admin-content {
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
 }
 
-.admin-actions .button.secondary {
-  color: var(--ink);
+.admin-sidebar {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 18px;
+  padding: 22px;
+}
+
+.admin-brand-block img {
+  width: 210px;
+  margin-bottom: 28px;
+}
+
+.admin-brand-block .eyebrow {
+  margin-bottom: 10px;
+}
+
+.admin-brand-block h1 {
+  font-size: 64px;
 }
 
 .admin-summary {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 12px;
+  align-content: start;
 }
 
 .admin-summary div {
-  padding: 22px;
+  padding: 18px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(8, 29, 51, 0.44);
 }
 
 .admin-summary span,
@@ -102,28 +121,70 @@
 .admin-summary span {
   margin-bottom: 8px;
   font-family: "Bebas Neue", Impact, sans-serif;
-  font-size: 42px;
+  font-size: 34px;
   line-height: 1;
 }
 
 .admin-summary strong {
   color: rgba(255, 255, 255, 0.66);
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 1.35;
   text-transform: uppercase;
 }
 
-.notification-list {
+.admin-actions {
   display: grid;
-  gap: 14px;
+  gap: 10px;
+}
+
+.admin-actions .button.secondary {
+  width: 100%;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.admin-content {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 22px;
+}
+
+.admin-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  align-items: flex-start;
+  padding-bottom: 16px;
+}
+
+.admin-dashboard-header h1 {
+  font-size: clamp(52px, 6vw, 86px);
+}
+
+.notification-list {
+  min-height: 0;
+  display: grid;
+  gap: 12px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.notification-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .notification-card {
-  padding: 22px;
-  border: 1px solid var(--line);
+  padding: 18px;
+  border: 1px solid rgba(8, 29, 51, 0.08);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   color: var(--ink);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
 }
 
 .notification-topline {
@@ -131,28 +192,28 @@
   justify-content: space-between;
   gap: 16px;
   align-items: baseline;
-  padding-bottom: 14px;
+  padding-bottom: 12px;
   border-bottom: 1px solid rgba(8, 29, 51, 0.12);
 }
 
 .notification-topline strong {
   font-family: "Bebas Neue", Impact, sans-serif;
-  font-size: 34px;
+  font-size: 30px;
   font-weight: 400;
 }
 
 .notification-topline time {
   color: rgba(8, 29, 51, 0.58);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .notification-card dl {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin: 18px 0 0;
+  grid-template-columns: 0.85fr 1.15fr 1.2fr;
+  gap: 12px 18px;
+  margin: 14px 0 0;
 }
 
 .notification-card div.wide {
@@ -167,8 +228,8 @@
 }
 
 .notification-card dd {
-  margin: 6px 0 0;
-  line-height: 1.55;
+  margin: 5px 0 0;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
@@ -177,19 +238,36 @@
   font-weight: 800;
 }
 
-@media (max-width: 760px) {
-  .admin-dashboard-header,
-  .notification-topline {
-    display: grid;
+@media (max-width: 840px) {
+  .admin-body {
+    overflow: auto;
   }
 
-  .admin-actions,
-  .admin-summary,
-  .notification-card dl {
+  .admin-shell {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .admin-dashboard {
+    height: auto;
+    min-height: calc(100vh - 36px);
     grid-template-columns: 1fr;
   }
 
-  .admin-actions {
+  .admin-sidebar {
+    grid-template-rows: auto;
+  }
+
+  .admin-brand-block img {
+    width: 190px;
+  }
+
+  .notification-card dl,
+  .notification-topline {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-topline {
     display: grid;
   }
 }
