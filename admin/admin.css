@@ -3,7 +3,7 @@
   overflow: hidden;
   color: var(--white);
   background:
-    linear-gradient(180deg, rgba(8, 29, 51, 0.97), rgba(6, 21, 37, 0.98)),
+    linear-gradient(180deg, rgba(7, 24, 42, 0.98), rgba(5, 17, 31, 0.98)),
     url("../assets/hero-storm-home.png");
   background-size: cover;
   background-position: center;
@@ -12,7 +12,7 @@
 .admin-shell {
   height: 100vh;
   width: 100%;
-  padding: 18px;
+  padding: 14px;
 }
 
 .admin-login[hidden],
@@ -69,32 +69,32 @@
 }
 
 .admin-dashboard {
-  height: calc(100vh - 36px);
+  height: calc(100vh - 28px);
   display: grid;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+  gap: 14px;
 }
 
 .admin-sidebar,
 .admin-content {
   min-height: 0;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
+  background: rgba(11, 32, 55, 0.78);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
 }
 
 .admin-sidebar {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 18px;
-  padding: 22px;
+  gap: 16px;
+  padding: 18px;
 }
 
 .admin-brand-block img {
-  width: 210px;
-  margin-bottom: 28px;
+  width: 156px;
+  margin-bottom: 22px;
 }
 
 .admin-brand-block .eyebrow {
@@ -102,7 +102,11 @@
 }
 
 .admin-brand-block h1 {
-  font-size: 64px;
+  font-family: "Montserrat", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .admin-summary {
@@ -112,10 +116,10 @@
 }
 
 .admin-summary div {
-  padding: 18px;
-  border: 1px solid var(--line);
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  background: rgba(8, 29, 51, 0.44);
+  background: rgba(4, 17, 31, 0.36);
 }
 
 .admin-summary span,
@@ -124,10 +128,11 @@
 }
 
 .admin-summary span {
-  margin-bottom: 8px;
-  font-family: "Bebas Neue", Impact, sans-serif;
-  font-size: 34px;
-  line-height: 1;
+  margin-bottom: 7px;
+  font-family: "Montserrat", Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.25;
 }
 
 .admin-summary strong {
@@ -144,6 +149,8 @@
 
 .admin-actions .button.secondary {
   width: 100%;
+  min-height: 42px;
+  padding: 10px 14px;
   color: var(--ink);
   background: rgba(255, 255, 255, 0.94);
 }
@@ -151,7 +158,7 @@
 .admin-content {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  padding: 22px;
+  padding: 18px;
 }
 
 .admin-dashboard-header {
@@ -159,19 +166,24 @@
   justify-content: space-between;
   gap: 22px;
   align-items: flex-start;
-  padding-bottom: 16px;
+  padding-bottom: 12px;
 }
 
 .admin-dashboard-header h1 {
-  font-size: clamp(52px, 6vw, 86px);
+  font-family: "Montserrat", Arial, sans-serif;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 800;
+  line-height: 1.15;
+  text-transform: none;
 }
 
 .notification-list {
   min-height: 0;
   display: grid;
-  gap: 12px;
+  gap: 10px;
   overflow: auto;
   padding-right: 6px;
+  align-content: start;
 }
 
 .notification-list::-webkit-scrollbar {
@@ -184,12 +196,12 @@
 }
 
 .notification-card {
-  padding: 18px;
-  border: 1px solid rgba(8, 29, 51, 0.08);
+  padding: 14px 16px;
+  border: 1px solid rgba(8, 29, 51, 0.1);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(246, 249, 252, 0.96);
   color: var(--ink);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
 }
 
 .notification-topline {
@@ -197,14 +209,14 @@
   justify-content: space-between;
   gap: 16px;
   align-items: baseline;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid rgba(8, 29, 51, 0.12);
 }
 
 .notification-topline strong {
-  font-family: "Bebas Neue", Impact, sans-serif;
-  font-size: 30px;
-  font-weight: 400;
+  font-family: "Montserrat", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .notification-topline time {
@@ -217,8 +229,8 @@
 .notification-card dl {
   display: grid;
   grid-template-columns: 0.85fr 1.15fr 1.2fr;
-  gap: 12px 18px;
-  margin: 14px 0 0;
+  gap: 10px 18px;
+  margin: 12px 0 0;
 }
 
 .notification-card div.wide {
@@ -227,14 +239,15 @@
 
 .notification-card dt {
   color: rgba(8, 29, 51, 0.56);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .notification-card dd {
   margin: 5px 0 0;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.42;
   overflow-wrap: anywhere;
 }
 
