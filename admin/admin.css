@@ -76,6 +76,10 @@
   padding-top: 8px;
 }
 
+.admin-actions .button.secondary {
+  color: var(--ink);
+}
+
 .admin-summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
