@@ -22,6 +22,12 @@ claimForm?.addEventListener("submit", (event) => {
   const submitButton = claimForm.querySelector('button[type="submit"]');
   const payload = Object.fromEntries(formData.entries());
 
+  if (window.location.protocol === "file:") {
+    status.textContent = "Open the site through the local Vercel server to submit this form.";
+    status.className = "form-status full is-error";
+    return;
+  }
+
   status.textContent = "Sending claim review...";
   status.className = "form-status full";
   submitButton.disabled = true;
