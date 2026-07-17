@@ -6,6 +6,7 @@ const {
   saveClaims,
   sendJson,
   validateClaim,
+  validateSpamCheck,
 } = require("./_backend");
 
 module.exports = async function handler(request, response) {
@@ -13,7 +14,7 @@ module.exports = async function handler(request, response) {
     if (request.method === "POST") {
       const body = await readBody(request);
       const claim = createClaim(body);
-      const error = validateClaim(claim);
+      const error = validateClaim(claim) || validateSpamCheck(body);
 
       if (error) {
         sendJson(response, 400, { error });

@@ -270,6 +270,14 @@
             What happened?
             <textarea name="message" rows="5" required></textarea>
           </label>
+          <label>
+            Security check: 4 + 3 =
+            <input name="captcha" type="text" inputmode="numeric" autocomplete="off" required />
+          </label>
+          <label class="bot-field" aria-hidden="true">
+            Website
+            <input name="website" type="text" tabindex="-1" autocomplete="off" />
+          </label>
           <button class="button primary full" type="submit">Send Claim Review</button>
           <p class="form-status full" role="status" aria-live="polite"></p>
         </form>

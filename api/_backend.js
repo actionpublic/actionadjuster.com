@@ -71,6 +71,18 @@ function validateClaim(claim) {
   return "";
 }
 
+function validateSpamCheck(input) {
+  if (cleanText(input.website, 300)) {
+    return "Submission blocked.";
+  }
+
+  if (cleanText(input.captcha, 20) !== "7") {
+    return "Security check answer is incorrect.";
+  }
+
+  return "";
+}
+
 function getAdminPassword() {
   if (process.env.ADMIN_PASSWORD) {
     return process.env.ADMIN_PASSWORD;
@@ -200,6 +212,7 @@ module.exports = {
   requireAdmin,
   saveClaims,
   sendJson,
+  validateSpamCheck,
   validateClaim,
   getAdminPassword,
 };
