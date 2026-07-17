@@ -124,6 +124,12 @@ loginForm.addEventListener("submit", async (event) => {
   const formData = new FormData(loginForm);
   const username = formData.get("username");
   const password = formData.get("password");
+
+  if (window.location.protocol === "file:") {
+    statusText.textContent = "Open the admin dashboard through the local Vercel server to log in.";
+    return;
+  }
+
   statusText.textContent = "Logging in...";
 
   try {
