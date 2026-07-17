@@ -142,6 +142,30 @@
   text-transform: uppercase;
 }
 
+.admin-view-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.admin-view-toggle button {
+  min-height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(4, 17, 31, 0.32);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.admin-view-toggle button.is-active {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.94);
+}
+
 .admin-actions {
   display: grid;
   gap: 10px;
@@ -198,8 +222,8 @@
 .notification-card {
   min-height: 48px;
   display: grid;
-  grid-template-columns: minmax(90px, 1fr) 150px minmax(90px, 0.8fr) minmax(140px, 1.2fr) minmax(150px, 1.2fr) minmax(140px, 1.3fr);
-  gap: 14px;
+  grid-template-columns: minmax(78px, 0.8fr) 128px minmax(78px, 0.75fr) minmax(126px, 1.1fr) minmax(126px, 1.1fr) minmax(94px, 1fr) 132px;
+  gap: 10px;
   align-items: center;
   padding: 10px 14px;
   border: 1px solid rgba(8, 29, 51, 0.1);
@@ -232,6 +256,32 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.notification-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  overflow: visible;
+}
+
+.notification-actions button {
+  min-width: 0;
+  min-height: 28px;
+  border: 1px solid rgba(8, 29, 51, 0.14);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.74);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.notification-actions button:hover {
+  background: var(--white);
 }
 
 @media (max-width: 840px) {

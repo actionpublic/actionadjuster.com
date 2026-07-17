@@ -7,6 +7,8 @@ const totalCount = document.querySelector("[data-total]");
 const latestDate = document.querySelector("[data-latest]");
 const refreshButton = document.querySelector("[data-refresh]");
 const logoutButton = document.querySelector("[data-logout]");
+const viewButtons = document.querySelectorAll("[data-view]");
+let currentView = "active";
 
 function getToken() {
   return window.localStorage.getItem("actionAdjustersAdminToken");
@@ -55,12 +57,16 @@ function escapeHtml(value) {
   });
 }
 
+function activeActionLabel() {
+  return currentView === "archived" ? "Restore" : "Delete";
+}
+
 function renderClaims(claims) {
   totalCount.textContent = claims.length;
   latestDate.textContent = claims[0] ? formatDate(claims[0].createdAt) : "None yet";
 
   if (!claims.length) {
-    notificationList.innerHTML = '<p class="empty-state">No claim notifications yet.</p>';
+    notificationList.innerHTML = `<p class="empty-state">No ${currentView === "archived" ? "archived" : "active"} claim notifications.</p>`;
     return;
   }
 
@@ -74,6 +80,16 @@ function renderClaims(claims) {
           <a href="mailto:${escapeHtml(claim.email)}" title="${escapeHtml(claim.email)}">${escapeHtml(claim.email)}</a>
           <span title="${escapeHtml(claim.damage)}">${escapeHtml(claim.damage)}</span>
           <span title="${escapeHtml(claim.message)}">${escapeHtml(claim.message)}</span>
+          <div class="notification-actions">
+            <button type="button" data-claim-action="${currentView === "archived" ? "restore" : "archive"}" data-claim-id="${claim.id}">
+              ${activeActionLabel()}
+            </button>
+            ${
+              currentView === "archived"
+                ? `<button type="button" data-claim-action="delete" data-claim-id="${claim.id}">Purge</button>`
+                : ""
+            }
+          </div>
         </article>
       `
     )
@@ -81,7 +97,7 @@ function renderClaims(claims) {
 }
 
 async function loadClaims() {
-  const response = await fetch("/api/claims", {
+  const response = await fetch(`/api/claims?status=${currentView}`, {
     headers: {
       Authorization: `Bearer ${getToken()}`,
     },
@@ -101,6 +117,26 @@ async function loadClaims() {
 
   showDashboard();
   renderClaims(data.claims || []);
+}
+
+async function updateClaim(id, action) {
+  const method = action === "delete" ? "DELETE" : "PATCH";
+  const body = action === "delete" ? { id } : { id, action };
+  const response = await fetch("/api/claims", {
+    method,
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || "Could not update claim.");
+  }
+
+  await loadClaims();
 }
 
 loginForm.addEventListener("submit", async (event) => {
@@ -140,6 +176,28 @@ loginForm.addEventListener("submit", async (event) => {
 
 refreshButton.addEventListener("click", () => {
   loadClaims().catch((error) => {
+    notificationList.innerHTML = `<p class="empty-state">${error.message}</p>`;
+  });
+});
+
+viewButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    currentView = button.dataset.view;
+    viewButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+    loadClaims().catch((error) => {
+      notificationList.innerHTML = `<p class="empty-state">${error.message}</p>`;
+    });
+  });
+});
+
+notificationList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-claim-action]");
+
+  if (!button) {
+    return;
+  }
+
+  updateClaim(button.dataset.claimId, button.dataset.claimAction).catch((error) => {
     notificationList.innerHTML = `<p class="empty-state">${error.message}</p>`;
   });
 });
