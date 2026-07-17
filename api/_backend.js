@@ -76,7 +76,15 @@ function getAdminPassword() {
     return process.env.ADMIN_PASSWORD;
   }
 
-  return process.env.NODE_ENV === "production" ? "" : "ActionAdmin2026!";
+  return process.env.NODE_ENV === "production" ? "" : "!LoveHashem1836";
+}
+
+function getAdminUsername() {
+  if (process.env.ADMIN_USERNAME) {
+    return process.env.ADMIN_USERNAME;
+  }
+
+  return process.env.NODE_ENV === "production" ? "" : "ilanR18";
 }
 
 function getTokenSecret() {
@@ -186,6 +194,7 @@ async function saveClaims(claims) {
 module.exports = {
   createAdminToken,
   createClaim,
+  getAdminUsername,
   listClaims,
   readBody,
   requireAdmin,

@@ -34,9 +34,12 @@ claim notifications.
 Set these Vercel environment variables before using the dashboard in production:
 
 ```text
+ADMIN_USERNAME=ilanR18
 ADMIN_PASSWORD=choose-a-private-password
 ADMIN_TOKEN_SECRET=choose-a-long-random-secret
 ```
+
+Local development defaults to username `ilanR18` and password `!LoveHashem1836`.
 
 For persistent production storage, add Vercel KV to the project. Vercel will
 provide `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Without KV, local development

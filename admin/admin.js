@@ -121,7 +121,9 @@ async function loadClaims() {
 
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const password = new FormData(loginForm).get("password");
+  const formData = new FormData(loginForm);
+  const username = formData.get("username");
+  const password = formData.get("password");
   statusText.textContent = "Logging in...";
 
   try {
@@ -130,7 +132,7 @@ loginForm.addEventListener("submit", async (event) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ username, password }),
     });
     const data = await response.json();
 

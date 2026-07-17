@@ -15,6 +15,11 @@
   padding: 18px;
 }
 
+.admin-login[hidden],
+.admin-dashboard[hidden] {
+  display: none;
+}
+
 .admin-login {
   width: min(520px, 100%);
   margin: min(8vh, 70px) auto 0;
