@@ -1,0 +1,191 @@
+.admin-body {
+  min-height: 100vh;
+  color: var(--white);
+  background:
+    linear-gradient(180deg, rgba(8, 29, 51, 0.96), rgba(6, 21, 37, 0.98)),
+    url("../assets/hero-storm-home.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.admin-shell {
+  width: min(1120px, calc(100% - 44px));
+  margin: 0 auto;
+  padding: clamp(34px, 6vw, 76px) 0;
+}
+
+.admin-login {
+  width: min(520px, 100%);
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 42px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(8, 29, 51, 0.84);
+  box-shadow: var(--shadow);
+}
+
+.admin-login img {
+  width: 230px;
+  margin-bottom: 30px;
+}
+
+.admin-login h1,
+.admin-dashboard h1 {
+  font-size: clamp(46px, 7vw, 78px);
+}
+
+.admin-login-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 26px;
+}
+
+.admin-login-form label {
+  display: grid;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-login-form .button {
+  width: 100%;
+}
+
+.admin-status,
+.empty-state {
+  min-height: 20px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.admin-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  align-items: flex-start;
+  margin-bottom: 26px;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.admin-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.admin-summary div {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-summary span,
+.admin-summary strong {
+  display: block;
+}
+
+.admin-summary span {
+  margin-bottom: 8px;
+  font-family: "Bebas Neue", Impact, sans-serif;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.admin-summary strong {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.notification-list {
+  display: grid;
+  gap: 14px;
+}
+
+.notification-card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.2);
+}
+
+.notification-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(8, 29, 51, 0.12);
+}
+
+.notification-topline strong {
+  font-family: "Bebas Neue", Impact, sans-serif;
+  font-size: 34px;
+  font-weight: 400;
+}
+
+.notification-topline time {
+  color: rgba(8, 29, 51, 0.58);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.notification-card dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 18px 0 0;
+}
+
+.notification-card div.wide {
+  grid-column: 1 / -1;
+}
+
+.notification-card dt {
+  color: rgba(8, 29, 51, 0.56);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.notification-card dd {
+  margin: 6px 0 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.notification-card a {
+  color: var(--navy);
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .admin-dashboard-header,
+  .notification-topline {
+    display: grid;
+  }
+
+  .admin-actions,
+  .admin-summary,
+  .notification-card dl {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-actions {
+    display: grid;
+  }
+}

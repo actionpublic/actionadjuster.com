@@ -241,7 +241,7 @@
             follow up about your property damage claim.
           </p>
         </div>
-        <form class="claim-form" action="mailto:ActionPublicAdj@gmail.com" method="post" enctype="text/plain">
+        <form class="claim-form" action="/api/claims" method="post">
           <label>
             Full name
             <input name="name" type="text" autocomplete="name" required />
@@ -271,6 +271,7 @@
             <textarea name="message" rows="5" required></textarea>
           </label>
           <button class="button primary full" type="submit">Send Claim Review</button>
+          <p class="form-status full" role="status" aria-live="polite"></p>
         </form>
       </section>
     </main>

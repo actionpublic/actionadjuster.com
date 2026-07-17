@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Action Adjusters Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body class="admin-body">
+    <main class="admin-shell">
+      <section class="admin-login" data-login-panel>
+        <img src="../assets/action-adjusters-logo.png" alt="Action Adjusters" />
+        <p class="eyebrow">Admin dashboard</p>
+        <h1>Claim notifications.</h1>
+        <form class="admin-login-form">
+          <label>
+            Admin password
+            <input name="password" type="password" autocomplete="current-password" required />
+          </label>
+          <button class="button primary" type="submit">Log In</button>
+          <p class="admin-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="admin-dashboard" data-dashboard hidden>
+        <header class="admin-dashboard-header">
+          <div>
+            <p class="eyebrow">Action Adjusters</p>
+            <h1>Claim notifications.</h1>
+          </div>
+          <div class="admin-actions">
+            <button class="button secondary" type="button" data-refresh>Refresh</button>
+            <button class="button secondary" type="button" data-logout>Log Out</button>
+          </div>
+        </header>
+
+        <div class="admin-summary">
+          <div>
+            <span data-total>0</span>
+            <strong>Total notifications</strong>
+          </div>
+          <div>
+            <span data-latest>None yet</span>
+            <strong>Latest submission</strong>
+          </div>
+        </div>
+
+        <div class="notification-list" data-notifications></div>
+      </section>
+    </main>
+
+    <script src="admin.js"></script>
+  </body>
+</html>

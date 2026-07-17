@@ -18,18 +18,37 @@ claimForm?.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const formData = new FormData(claimForm);
-  const body = [
-    `Full name: ${formData.get("name") || ""}`,
-    `Phone: ${formData.get("phone") || ""}`,
-    `Email: ${formData.get("email") || ""}`,
-    `Type of damage: ${formData.get("damage") || ""}`,
-    "",
-    "What happened?",
-    `${formData.get("message") || ""}`,
-  ].join("\n");
+  const status = claimForm.querySelector(".form-status");
+  const submitButton = claimForm.querySelector('button[type="submit"]');
+  const payload = Object.fromEntries(formData.entries());
 
-  const subject = encodeURIComponent("New Action Adjusters Claim Review");
-  const message = encodeURIComponent(body);
+  status.textContent = "Sending claim review...";
+  status.className = "form-status full";
+  submitButton.disabled = true;
 
-  window.location.href = `mailto:ActionPublicAdj@gmail.com?subject=${subject}&body=${message}`;
+  fetch(claimForm.action, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+    .then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || "Submission failed.");
+      }
+
+      claimForm.reset();
+      status.textContent = "Claim review sent. The admin dashboard has a new notification.";
+      status.classList.add("is-success");
+    })
+    .catch((error) => {
+      status.textContent = error.message || "Please try again.";
+      status.classList.add("is-error");
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+    });
 });
