@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const {
+  applyCors,
   createClaim,
   createPortalCode,
   listClaims,
@@ -23,6 +24,14 @@ function addActivityLog(claim, type, title, detail) {
 }
 
 module.exports = async function handler(request, response) {
+  applyCors(request, response);
+
+  if (request.method === "OPTIONS") {
+    response.statusCode = 204;
+    response.end();
+    return;
+  }
+
   try {
     if (request.method === "POST") {
       const body = await readBody(request);

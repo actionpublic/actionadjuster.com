@@ -1,6 +1,15 @@
 const menuButton = document.querySelector(".menu-toggle");
 const nav = document.querySelector(".site-nav");
 const claimForm = document.querySelector(".claim-form");
+const CANONICAL_API_ORIGIN = "https://files-mentioned-by-the-user-4a31b83.vercel.app";
+
+function getClaimsApiUrl() {
+  if (window.location.hostname.endsWith("actionadjusters.com")) {
+    return `${CANONICAL_API_ORIGIN}/api/claims`;
+  }
+
+  return claimForm.action;
+}
 
 menuButton?.addEventListener("click", () => {
   const isOpen = nav.classList.toggle("is-open");
@@ -32,7 +41,7 @@ claimForm?.addEventListener("submit", (event) => {
   status.className = "form-status full";
   submitButton.disabled = true;
 
-  fetch(claimForm.action, {
+  fetch(getClaimsApiUrl(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -8,6 +8,11 @@ const ADMIN_PROFILE_KEY = "action-adjusters:admin-profile";
 const MAX_CLAIMS = 250;
 const FALLBACK_FILE = path.join(os.tmpdir(), "action-adjusters-claims.json");
 const ADMIN_PROFILE_FILE = path.join(os.tmpdir(), "action-adjusters-admin-profile.json");
+const ALLOWED_ORIGINS = new Set([
+  "https://www.actionadjusters.com",
+  "https://actionadjusters.com",
+  "https://files-mentioned-by-the-user-4a31b83.vercel.app",
+]);
 
 function createPortalCode() {
   return crypto.randomBytes(4).toString("hex").toUpperCase();
@@ -17,6 +22,18 @@ function sendJson(response, status, data) {
   response.statusCode = status;
   response.setHeader("Content-Type", "application/json");
   response.end(JSON.stringify(data));
+}
+
+function applyCors(request, response) {
+  const origin = request.headers.origin;
+
+  if (ALLOWED_ORIGINS.has(origin)) {
+    response.setHeader("Access-Control-Allow-Origin", origin);
+    response.setHeader("Vary", "Origin");
+  }
+
+  response.setHeader("Access-Control-Allow-Methods", "DELETE, GET, OPTIONS, PATCH, POST");
+  response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
 }
 
 function readBody(request) {
@@ -311,6 +328,7 @@ async function saveAdminProfile(profile) {
 }
 
 module.exports = {
+  applyCors,
   createAdminToken,
   createClaim,
   createPortalCode,
