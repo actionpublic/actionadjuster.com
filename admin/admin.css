@@ -268,6 +268,23 @@
   color: var(--ink);
 }
 
+.dashboard-message {
+  margin: 0;
+  border: 1px solid rgba(220, 38, 38, 0.28);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #8f1d1d;
+  background: #fff1f1;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.dashboard-message[data-type="success"] {
+  border-color: rgba(22, 163, 74, 0.28);
+  color: #126736;
+  background: #edfdf3;
+}
+
 .notification-list {
   min-height: 0;
   display: grid;

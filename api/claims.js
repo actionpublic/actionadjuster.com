@@ -23,6 +23,45 @@ function addActivityLog(claim, type, title, detail) {
   });
 }
 
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function clientPortalEmail(claim) {
+  return normalizeEmail(claim.clientProfile?.email || claim.email);
+}
+
+function findDuplicateClientEmail(claims, claim, email) {
+  const targetEmail = normalizeEmail(email);
+
+  if (!targetEmail) {
+    return null;
+  }
+
+  return claims.find((item) => {
+    if (item.id === claim.id || item.status === "archived") {
+      return false;
+    }
+
+    const hasClientPortal = item.crmStage === "client" || item.portalEnabled;
+    return hasClientPortal && clientPortalEmail(item) === targetEmail;
+  });
+}
+
+function ensureUniqueClientPortalEmail(response, claims, claim, email) {
+  if (!normalizeEmail(email)) {
+    sendJson(response, 400, { error: "Client email address is required." });
+    return false;
+  }
+
+  if (findDuplicateClientEmail(claims, claim, email)) {
+    sendJson(response, 409, { error: "Email address is already being used." });
+    return false;
+  }
+
+  return true;
+}
+
 module.exports = async function handler(request, response) {
   applyCors(request, response);
 
@@ -99,6 +138,10 @@ module.exports = async function handler(request, response) {
         claim.leadStatus = claim.leadStatus || "Contact Needed";
         claim.promotedToLeadAt = new Date().toISOString();
       } else if (body.action === "promoteClient") {
+        if (!ensureUniqueClientPortalEmail(response, claims, claim, clientPortalEmail(claim))) {
+          return;
+        }
+
         claim.crmStage = "client";
         claim.clientStatus = claim.clientStatus || "Active Claim";
         claim.portalEnabled = true;
@@ -123,8 +166,16 @@ module.exports = async function handler(request, response) {
             .join("; ") || "CRM status reviewed and saved."
         );
       } else if (body.action === "portal") {
+        if (Boolean(body.portalEnabled) && !ensureUniqueClientPortalEmail(response, claims, claim, clientPortalEmail(claim))) {
+          return;
+        }
+
         claim.portalEnabled = Boolean(body.portalEnabled);
       } else if (body.action === "resetPortalCode") {
+        if (!ensureUniqueClientPortalEmail(response, claims, claim, clientPortalEmail(claim))) {
+          return;
+        }
+
         claim.portalCode = createPortalCode();
         claim.portalCodeResetAt = new Date().toISOString();
       } else if (body.action === "setPortalCode") {
@@ -138,11 +189,17 @@ module.exports = async function handler(request, response) {
         claim.portalCode = nextPortalCode;
         claim.portalCodeResetAt = new Date().toISOString();
       } else if (body.action === "clientProfile") {
+        const nextEmail = String(body.email || "").trim().slice(0, 160);
+
+        if ((claim.crmStage === "client" || claim.portalEnabled) && !ensureUniqueClientPortalEmail(response, claims, claim, nextEmail)) {
+          return;
+        }
+
         claim.clientProfile = {
           ...(claim.clientProfile || {}),
           displayName: String(body.displayName || "").trim().slice(0, 160),
           phone: String(body.phone || "").trim().slice(0, 80),
-          email: String(body.email || "").trim().slice(0, 160),
+          email: nextEmail,
           mailingAddress: String(body.mailingAddress || "").trim().slice(0, 500),
           city: String(body.city || "").trim().slice(0, 120),
           state: String(body.state || "").trim().slice(0, 80),

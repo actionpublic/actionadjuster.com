@@ -18,6 +18,7 @@ const statusFilter = document.querySelector("[data-status-filter]");
 const damageFilter = document.querySelector("[data-damage-filter]");
 const uploaderFilter = document.querySelector("[data-uploader-filter]");
 const sortSelect = document.querySelector("[data-sort]");
+const dashboardMessage = document.querySelector("[data-dashboard-message]");
 let currentView = "active";
 let currentCrmView = "inquiries";
 let currentClaims = [];
@@ -45,6 +46,16 @@ function showLogin(message = "") {
   loginPanel.hidden = false;
   dashboard.hidden = true;
   statusText.textContent = message;
+}
+
+function setDashboardMessage(message = "", type = "error") {
+  if (!dashboardMessage) {
+    return;
+  }
+
+  dashboardMessage.textContent = message;
+  dashboardMessage.dataset.type = type;
+  dashboardMessage.hidden = !message;
 }
 
 function formatDate(value) {
@@ -865,12 +876,14 @@ async function loadClaims() {
   if (!currentAdminProfile) {
     await loadAdminProfile();
   }
+  setDashboardMessage("");
   currentClaims = data.claims || [];
   updateDamageOptions(currentClaims);
   applyFilters();
 }
 
 async function updateClaim(id, action, extra = {}) {
+  setDashboardMessage("");
   const method = action === "delete" ? "DELETE" : "PATCH";
   const body = action === "delete" ? { id } : { id, action, ...extra };
   const response = await fetch("/api/claims", {
@@ -1090,7 +1103,7 @@ notificationList.addEventListener("click", async (event) => {
     }
 
     updateClaim(button.dataset.claimId, action, extra).catch((error) => {
-      notificationList.innerHTML = `<p class="empty-state">${error.message}</p>`;
+      setDashboardMessage(error.message || "Could not update claim.");
     });
     return;
   }
