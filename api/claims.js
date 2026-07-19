@@ -127,6 +127,16 @@ module.exports = async function handler(request, response) {
       } else if (body.action === "resetPortalCode") {
         claim.portalCode = createPortalCode();
         claim.portalCodeResetAt = new Date().toISOString();
+      } else if (body.action === "setPortalCode") {
+        const nextPortalCode = String(body.portalCode || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 24);
+
+        if (nextPortalCode.length < 6) {
+          sendJson(response, 400, { error: "Portal code must be at least 6 letters or numbers." });
+          return;
+        }
+
+        claim.portalCode = nextPortalCode;
+        claim.portalCodeResetAt = new Date().toISOString();
       } else if (body.action === "clientProfile") {
         claim.clientProfile = {
           ...(claim.clientProfile || {}),

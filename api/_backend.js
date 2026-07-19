@@ -2,9 +2,12 @@ const crypto = require("crypto");
 const fs = require("fs/promises");
 const os = require("os");
 const path = require("path");
+const { get: getBlob, put: putBlob } = require("@vercel/blob");
 
 const CLAIMS_KEY = "action-adjusters:claims";
 const ADMIN_PROFILE_KEY = "action-adjusters:admin-profile";
+const CLAIMS_BLOB_PATH = "action-adjusters/claims.json";
+const ADMIN_PROFILE_BLOB_PATH = "action-adjusters/admin-profile.json";
 const MAX_CLAIMS = 250;
 const FALLBACK_FILE = path.join(os.tmpdir(), "action-adjusters-claims.json");
 const ADMIN_PROFILE_FILE = path.join(os.tmpdir(), "action-adjusters-admin-profile.json");
@@ -250,6 +253,35 @@ async function kvRequest(command) {
   return data.result;
 }
 
+async function readJsonBlob(pathname) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return null;
+  }
+
+  const blob = await getBlob(pathname, { access: "private", useCache: false });
+
+  if (!blob || blob.statusCode !== 200 || !blob.stream) {
+    return null;
+  }
+
+  const text = await new Response(blob.stream).text();
+  return JSON.parse(text);
+}
+
+async function writeJsonBlob(pathname, value) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return false;
+  }
+
+  await putBlob(pathname, JSON.stringify(value, null, 2), {
+    access: "private",
+    allowOverwrite: true,
+    contentType: "application/json",
+  });
+
+  return true;
+}
+
 async function readFallbackStore() {
   try {
     const contents = await fs.readFile(FALLBACK_FILE, "utf8");
@@ -266,6 +298,12 @@ async function listClaims() {
     return normalizeClaims(JSON.parse(stored));
   }
 
+  const blobClaims = await readJsonBlob(CLAIMS_BLOB_PATH);
+
+  if (blobClaims) {
+    return normalizeClaims(blobClaims);
+  }
+
   return normalizeClaims(await readFallbackStore());
 }
 
@@ -273,7 +311,7 @@ async function saveClaims(claims) {
   const trimmed = claims.slice(0, MAX_CLAIMS);
   const saved = await kvRequest(["SET", CLAIMS_KEY, JSON.stringify(trimmed)]);
 
-  if (saved === null) {
+  if (saved === null && !(await writeJsonBlob(CLAIMS_BLOB_PATH, trimmed))) {
     await fs.writeFile(FALLBACK_FILE, JSON.stringify(trimmed, null, 2));
   }
 
@@ -313,6 +351,12 @@ async function getAdminProfile() {
     return normalizeAdminProfile(JSON.parse(stored));
   }
 
+  const blobProfile = await readJsonBlob(ADMIN_PROFILE_BLOB_PATH);
+
+  if (blobProfile) {
+    return normalizeAdminProfile(blobProfile);
+  }
+
   return normalizeAdminProfile(await readAdminProfileFallback());
 }
 
@@ -320,7 +364,7 @@ async function saveAdminProfile(profile) {
   const nextProfile = normalizeAdminProfile(profile);
   const saved = await kvRequest(["SET", ADMIN_PROFILE_KEY, JSON.stringify(nextProfile)]);
 
-  if (saved === null) {
+  if (saved === null && !(await writeJsonBlob(ADMIN_PROFILE_BLOB_PATH, nextProfile))) {
     await fs.writeFile(ADMIN_PROFILE_FILE, JSON.stringify(nextProfile, null, 2));
   }
 
