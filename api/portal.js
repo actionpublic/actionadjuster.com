@@ -37,13 +37,13 @@ function findPortalClaim(claims, body) {
   const email = String(body.email || "").trim().toLowerCase();
   const portalCode = String(body.portalCode || "").trim().toUpperCase();
 
-  return claims.find(
-    (claim) =>
-      claim.crmStage === "client" &&
-      claim.portalEnabled &&
-      String(claim.email || "").trim().toLowerCase() === email &&
-      String(claim.portalCode || "").trim().toUpperCase() === portalCode
-  );
+  return claims.find((claim) => {
+    const profileEmail = String(claim.clientProfile?.email || "").trim().toLowerCase();
+    const claimEmail = String(claim.email || "").trim().toLowerCase();
+    const emails = new Set([profileEmail, claimEmail].filter(Boolean));
+
+    return claim.portalEnabled && emails.has(email) && String(claim.portalCode || "").trim().toUpperCase() === portalCode;
+  });
 }
 
 module.exports = async function handler(request, response) {
