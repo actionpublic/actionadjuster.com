@@ -102,7 +102,7 @@
 }
 
 .admin-brand-block h1 {
-  font-family: "Montserrat", Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
   font-size: 22px;
   font-weight: 800;
   line-height: 1.2;
@@ -129,7 +129,7 @@
 
 .admin-summary span {
   margin-bottom: 7px;
-  font-family: "Montserrat", Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
   font-size: 17px;
   font-weight: 800;
   line-height: 1.25;
@@ -146,6 +146,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
+}
+
+.admin-view-toggle.crm-nav {
+  grid-template-columns: 1fr;
 }
 
 .admin-view-toggle button {
@@ -181,7 +185,7 @@
 
 .admin-content {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
   padding: 18px;
 }
 
@@ -194,19 +198,83 @@
 }
 
 .admin-dashboard-header h1 {
-  font-family: "Montserrat", Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
   font-size: clamp(24px, 3vw, 34px);
   font-weight: 800;
   line-height: 1.15;
   text-transform: none;
 }
 
+.admin-icon-button {
+  width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(99, 216, 238, 0.35);
+  border-radius: 8px;
+  color: var(--aqua);
+  background: rgba(4, 17, 31, 0.42);
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.admin-icon-button:hover {
+  border-color: rgba(99, 216, 238, 0.75);
+  background: rgba(47, 167, 225, 0.18);
+  transform: translateY(-1px);
+}
+
+.admin-icon-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.admin-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(190px, 1.45fr) minmax(105px, 0.7fr) minmax(130px, 0.85fr) minmax(130px, 0.85fr) minmax(130px, 0.85fr);
+  gap: 10px;
+  align-items: end;
+  padding: 10px 0 14px;
+}
+
+.admin-filter-bar label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-filter-bar input,
+.admin-filter-bar select {
+  min-height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--white);
+  background: rgba(4, 17, 31, 0.42);
+  font-size: 13px;
+}
+
+.admin-filter-bar select option {
+  color: var(--ink);
+}
+
 .notification-list {
   min-height: 0;
   display: grid;
   gap: 10px;
-  overflow: auto;
-  padding-right: 6px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
   align-content: start;
 }
 
@@ -220,49 +288,102 @@
 }
 
 .notification-card {
-  min-height: 48px;
-  display: grid;
-  grid-template-columns: minmax(78px, 0.8fr) 128px minmax(78px, 0.75fr) minmax(126px, 1.1fr) minmax(126px, 1.1fr) minmax(94px, 1fr) 132px;
-  gap: 10px;
-  align-items: center;
-  padding: 10px 14px;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
   border: 1px solid rgba(8, 29, 51, 0.1);
   border-radius: 8px;
   background: rgba(246, 249, 252, 0.96);
   color: var(--ink);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
 }
 
-.notification-card strong {
-  font-family: "Montserrat", Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 800;
+.notification-summary {
+  min-width: 0;
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: minmax(70px, 0.8fr) 82px 68px minmax(70px, 0.75fr) minmax(118px, 1.08fr) minmax(118px, 1.05fr) minmax(82px, 0.95fr) 92px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
 }
 
-.notification-card time {
-  color: rgba(8, 29, 51, 0.58);
-  font-size: 10px;
+.notification-card:focus {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.notification-card.is-expanded {
+  background: var(--white);
+  border-color: rgba(47, 167, 225, 0.42);
+}
+
+.notification-card.is-completed {
+  border-color: rgba(42, 157, 87, 0.38);
+  background: rgba(244, 252, 247, 0.96);
+}
+
+.notification-field {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.notification-field > span:first-child {
+  color: rgba(8, 29, 51, 0.52);
+  font-size: 9px;
   font-weight: 800;
+  line-height: 1;
   text-transform: uppercase;
 }
 
-.notification-card a {
-  color: var(--navy);
-  font-weight: 800;
-}
-
-.notification-card > * {
+.notification-field > :last-child {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--ink);
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.notification-field strong {
+  font-weight: 800;
+}
+
+.notification-field time {
+  color: rgba(8, 29, 51, 0.58);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.notification-field a {
+  color: var(--navy);
+  font-weight: 800;
 }
 
 .notification-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(28px, max-content));
   justify-content: flex-end;
-  gap: 6px;
+  align-items: center;
+  gap: 4px 6px;
   overflow: visible;
+  cursor: default;
+}
+
+.notification-actions > span:first-child {
+  grid-column: 1 / -1;
+}
+
+.notification-actions > :last-child {
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .notification-actions button {
@@ -282,6 +403,443 @@
 
 .notification-actions button:hover {
   background: var(--white);
+}
+
+.notification-actions .icon-trash {
+  width: 32px;
+  min-height: 28px;
+  justify-self: end;
+  padding: 5px;
+  color: #c5162e;
+  border-color: rgba(197, 22, 46, 0.28);
+  background: rgba(197, 22, 46, 0.08);
+}
+
+.notification-actions .icon-trash:hover {
+  color: #ffffff;
+  background: #c5162e;
+}
+
+.notification-actions .icon-trash svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  margin: 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.notification-actions .icon-check {
+  width: 32px;
+  min-height: 28px;
+  padding: 5px;
+  color: #168a45;
+  border-color: rgba(22, 138, 69, 0.28);
+  background: rgba(22, 138, 69, 0.08);
+}
+
+.notification-actions .icon-check:hover,
+.notification-actions .icon-check.is-complete {
+  color: #ffffff;
+  background: #168a45;
+}
+
+.notification-actions .icon-check svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  margin: 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.notification-details {
+  display: none;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0 14px 14px;
+  border-top: 1px solid rgba(8, 29, 51, 0.14);
+  cursor: default;
+}
+
+.notification-card.is-expanded .notification-details {
+  display: block;
+}
+
+.notification-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.8fr) minmax(160px, 0.8fr) minmax(220px, 1.4fr);
+  gap: 10px;
+  padding-top: 12px;
+}
+
+.notification-detail-grid section {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(8, 29, 51, 0.1);
+  border-radius: 8px;
+  background: rgba(8, 29, 51, 0.03);
+}
+
+.notification-detail-grid h2 {
+  margin: 0 0 8px;
+  color: rgba(8, 29, 51, 0.52);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.notification-detail-grid p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.notification-detail-grid p + p {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(8, 29, 51, 0.08);
+}
+
+.notification-detail-grid p span {
+  display: block;
+  margin-bottom: 2px;
+  color: rgba(8, 29, 51, 0.52);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.notification-details a {
+  color: var(--navy);
+  font-weight: 800;
+}
+
+.crm-workflow-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.crm-workflow-panel section,
+.crm-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(8, 29, 51, 0.1);
+  border-radius: 8px;
+  background: rgba(8, 29, 51, 0.035);
+}
+
+.crm-workflow-panel h2 {
+  margin: 0 0 8px;
+  color: rgba(8, 29, 51, 0.52);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.crm-workflow-panel p,
+.mini-list p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.crm-workflow-panel p + p,
+.mini-list p + p {
+  margin-top: 6px;
+}
+
+.crm-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.crm-button-row span {
+  color: rgba(8, 29, 51, 0.62);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.crm-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.profile-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(8, 29, 51, 0.1);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(246, 249, 252, 0.96);
+}
+
+.profile-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(8, 29, 51, 0.1);
+}
+
+.profile-card-header span {
+  display: block;
+  color: rgba(8, 29, 51, 0.52);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.profile-card-header strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.profile-card-header p {
+  max-width: 360px;
+  margin: 0;
+  color: rgba(8, 29, 51, 0.62);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.profile-form-grid.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 0 10px;
+}
+
+.crm-form-grid label,
+.profile-form-grid label,
+.checkbox-row {
+  display: grid;
+  gap: 5px;
+  color: rgba(8, 29, 51, 0.58);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  text-transform: none;
+}
+
+.crm-form-grid input,
+.crm-form-grid select,
+.profile-form-grid input,
+.profile-form-grid select,
+.profile-form-grid textarea,
+.crm-workflow-panel textarea,
+.crm-workflow-panel input[type="file"] {
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  border: 1px solid rgba(8, 29, 51, 0.14);
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.88);
+  font: inherit;
+  font-size: 12px;
+}
+
+.profile-form-grid .wide {
+  grid-column: 1 / -1;
+}
+
+.crm-workflow-panel button,
+.crm-link-button {
+  min-height: 34px;
+  border: 1px solid rgba(15, 76, 129, 0.2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--white);
+  background: var(--navy);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.crm-workflow-panel a.crm-link-button,
+.crm-card a.crm-link-button {
+  color: var(--white);
+}
+
+.mini-list {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(8, 29, 51, 0.08);
+}
+
+.activity-log {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  gap: 0;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(8, 29, 51, 0.1);
+  border-radius: 8px;
+  background: rgba(8, 29, 51, 0.035);
+}
+
+.activity-log h2 {
+  margin: 0 0 8px;
+  color: rgba(8, 29, 51, 0.52);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.activity-log > p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.activity-entry {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(8, 29, 51, 0.08);
+}
+
+.activity-entry:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.activity-entry time {
+  color: rgba(8, 29, 51, 0.52);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.activity-entry strong,
+.activity-entry p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.activity-entry strong {
+  font-weight: 800;
+}
+
+.activity-entry p {
+  font-weight: 600;
+}
+
+.crm-card {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(110px, 0.85fr) auto;
+  gap: 12px;
+  align-items: center;
+  color: var(--ink);
+  background: rgba(246, 249, 252, 0.96);
+}
+
+.crm-card span {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(8, 29, 51, 0.52);
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.crm-card strong {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.internal-notes {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 12px 12px;
+  border: 1px solid rgba(47, 167, 225, 0.24);
+  border-radius: 8px;
+  background: rgba(47, 167, 225, 0.06);
+}
+
+.internal-notes label {
+  display: grid;
+  gap: 8px;
+  color: rgba(8, 29, 51, 0.62);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.internal-notes textarea {
+  width: 100%;
+  max-width: 100%;
+  min-height: 86px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(8, 29, 51, 0.14);
+  resize: vertical;
+}
+
+.internal-notes button {
+  justify-self: end;
+  min-height: 34px;
+  border: 1px solid rgba(15, 76, 129, 0.2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--white);
+  background: var(--navy);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 @media (max-width: 840px) {
@@ -308,13 +866,24 @@
     width: 190px;
   }
 
-  .notification-card {
+  .admin-filter-bar {
     grid-template-columns: 1fr;
-    gap: 6px;
+  }
+
+  .notification-card {
     white-space: normal;
   }
 
-  .notification-card > * {
+  .notification-summary,
+  .notification-detail-grid,
+  .crm-workflow-panel,
+  .crm-form-grid,
+  .profile-form-grid,
+  .crm-card {
+    grid-template-columns: 1fr;
+  }
+
+  .notification-field {
     white-space: nowrap;
   }
 }

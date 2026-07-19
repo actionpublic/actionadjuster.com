@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Action Adjusters Client Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="portal.css" />
+  </head>
+  <body class="portal-body">
+    <main class="portal-shell">
+      <section class="portal-card" data-login>
+        <img src="../assets/action-adjusters-logo.png" alt="Action Adjusters" />
+        <p class="eyebrow">Client portal</p>
+        <h1>Log in for real-time updates on your claim.</h1>
+        <form class="portal-form">
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            Portal code
+            <input name="portalCode" type="text" autocomplete="one-time-code" required />
+          </label>
+          <button class="button primary" type="submit">View Claim</button>
+          <p class="portal-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="portal-dashboard" data-dashboard hidden>
+        <aside class="portal-sidebar">
+          <div>
+            <img src="../assets/action-adjusters-logo.png" alt="Action Adjusters" />
+            <p class="eyebrow">Client portal</p>
+            <h1 data-claim-title>Claim</h1>
+            <p class="portal-summary" data-claim-status></p>
+          </div>
+          <nav class="portal-nav" aria-label="Client portal sections">
+            <button class="is-active" type="button" data-portal-view="profile">Profile</button>
+            <button type="button" data-portal-view="claim">Claim Status</button>
+            <button type="button" data-portal-view="updates">Updates</button>
+            <button type="button" data-portal-view="documents">Documents</button>
+            <button type="button" data-portal-view="upload">Upload</button>
+          </nav>
+          <button class="button secondary" type="button" data-logout>Log Out</button>
+        </aside>
+
+        <section class="portal-content" aria-live="polite">
+          <header class="portal-content-header">
+            <div>
+              <p class="eyebrow">Dashboard</p>
+              <h2 data-panel-title>My Profile</h2>
+            </div>
+          </header>
+
+          <article class="portal-panel is-active" data-portal-panel="profile">
+            <form class="portal-profile-form">
+              <label>
+                Name
+                <input name="displayName" type="text" autocomplete="name" />
+              </label>
+              <label>
+                Email
+                <input name="profileEmail" type="email" autocomplete="email" />
+              </label>
+              <label>
+                Phone
+                <input name="phone" type="text" autocomplete="tel" />
+              </label>
+              <label>
+                Preferred Contact
+                <select name="preferredContact">
+                  <option>Phone</option>
+                  <option>Email</option>
+                  <option>Text</option>
+                </select>
+              </label>
+              <label class="full">
+                Mailing Address
+                <input name="mailingAddress" type="text" autocomplete="street-address" />
+              </label>
+              <label>
+                City
+                <input name="city" type="text" autocomplete="address-level2" />
+              </label>
+              <label>
+                State
+                <input name="state" type="text" autocomplete="address-level1" />
+              </label>
+              <label>
+                ZIP
+                <input name="zip" type="text" autocomplete="postal-code" />
+              </label>
+              <button class="button primary" type="submit">Save Profile</button>
+              <p class="portal-status" data-profile-status role="status" aria-live="polite"></p>
+            </form>
+          </article>
+          <article class="portal-panel" data-portal-panel="claim">
+            <div class="status-overview" data-claim-overview></div>
+          </article>
+          <article class="portal-panel" data-portal-panel="updates">
+            <div data-updates></div>
+          </article>
+          <article class="portal-panel" data-portal-panel="documents">
+            <div data-documents></div>
+          </article>
+          <article class="portal-panel" data-portal-panel="upload">
+            <form class="portal-upload-form">
+              <input name="document" type="file" required />
+              <button class="button primary" type="submit">Upload</button>
+              <p class="portal-status" data-upload-status role="status" aria-live="polite"></p>
+            </form>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script src="portal.js"></script>
+  </body>
+</html>

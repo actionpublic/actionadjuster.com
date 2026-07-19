@@ -28,8 +28,18 @@ http://localhost:8766/admin/
 
 ## Admin Dashboard
 
-The claim form posts to `/api/claims`. Admins can log in at `/admin/` to see
-claim notifications.
+The claim form posts to `/api/claims`. Admins can log in at `/admin/` to manage
+claim inquiries, turn inquiries into leads, convert leads into clients, track
+follow-ups, add internal notes, post client-visible updates, and attach small
+prototype documents. The admin CRM also includes an admin user profile section
+and editable client portal user profiles on client records.
+
+Clients can use `/portal/` with their email and portal code after portal access
+is enabled on a client record. Client portal users can view and edit their basic
+profile details, view claim updates/documents, and upload documents.
+
+Document upload/storage in this version is a lightweight prototype stored with
+the claim record. Use proper object storage before production document handling.
 
 Set these Vercel environment variables before using the dashboard in production:
 

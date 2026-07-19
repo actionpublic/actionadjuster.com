@@ -4,8 +4,14 @@ const os = require("os");
 const path = require("path");
 
 const CLAIMS_KEY = "action-adjusters:claims";
+const ADMIN_PROFILE_KEY = "action-adjusters:admin-profile";
 const MAX_CLAIMS = 250;
 const FALLBACK_FILE = path.join(os.tmpdir(), "action-adjusters-claims.json");
+const ADMIN_PROFILE_FILE = path.join(os.tmpdir(), "action-adjusters-admin-profile.json");
+
+function createPortalCode() {
+  return crypto.randomBytes(4).toString("hex").toUpperCase();
+}
 
 function sendJson(response, status, data) {
   response.statusCode = status;
@@ -19,7 +25,7 @@ function readBody(request) {
 
     request.on("data", (chunk) => {
       body += chunk;
-      if (body.length > 1_000_000) {
+      if (body.length > 3_500_000) {
         request.destroy();
         reject(new Error("Request body is too large."));
       }
@@ -49,6 +55,27 @@ function createClaim(input) {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     status: "new",
+    crmStage: "inquiry",
+    leadStatus: "New Inquiry",
+    clientStatus: "",
+    followUpAt: "",
+    portalCode: createPortalCode(),
+    portalEnabled: false,
+    clientProfile: {
+      displayName: cleanText(input.name, 160),
+      phone: cleanText(input.phone, 80),
+      email: cleanText(input.email, 160),
+      mailingAddress: "",
+      city: "",
+      state: "",
+      zip: "",
+      preferredContact: "Phone",
+      portalRole: "Client",
+      portalNotes: "",
+    },
+    updates: [],
+    documents: [],
+    activityLog: [],
     name: cleanText(input.name, 160),
     phone: cleanText(input.phone, 80),
     email: cleanText(input.email, 160),
@@ -69,6 +96,39 @@ function validateClaim(claim) {
   }
 
   return "";
+}
+
+function normalizeClaim(claim) {
+  const clientProfile = claim.clientProfile || {};
+
+  return {
+    ...claim,
+    crmStage: claim.crmStage || "inquiry",
+    leadStatus: claim.leadStatus || (claim.crmStage === "lead" ? "Contact Needed" : "New Inquiry"),
+    clientStatus: claim.clientStatus || (claim.crmStage === "client" ? "Active Claim" : ""),
+    followUpAt: claim.followUpAt || "",
+    portalCode: claim.portalCode || createPortalCode(),
+    portalEnabled: Boolean(claim.portalEnabled),
+    clientProfile: {
+      displayName: clientProfile.displayName || claim.name || "",
+      phone: clientProfile.phone || claim.phone || "",
+      email: clientProfile.email || claim.email || "",
+      mailingAddress: clientProfile.mailingAddress || "",
+      city: clientProfile.city || "",
+      state: clientProfile.state || "",
+      zip: clientProfile.zip || "",
+      preferredContact: clientProfile.preferredContact || "Phone",
+      portalRole: clientProfile.portalRole || "Client",
+      portalNotes: clientProfile.portalNotes || "",
+    },
+    updates: Array.isArray(claim.updates) ? claim.updates : [],
+    documents: Array.isArray(claim.documents) ? claim.documents : [],
+    activityLog: Array.isArray(claim.activityLog) ? claim.activityLog : [],
+  };
+}
+
+function normalizeClaims(claims) {
+  return claims.map(normalizeClaim);
 }
 
 function validateSpamCheck(input) {
@@ -186,10 +246,10 @@ async function listClaims() {
   const stored = await kvRequest(["GET", CLAIMS_KEY]);
 
   if (stored) {
-    return JSON.parse(stored);
+    return normalizeClaims(JSON.parse(stored));
   }
 
-  return readFallbackStore();
+  return normalizeClaims(await readFallbackStore());
 }
 
 async function saveClaims(claims) {
@@ -203,14 +263,65 @@ async function saveClaims(claims) {
   return trimmed;
 }
 
+function defaultAdminProfile() {
+  return {
+    name: "Action Adjusters Admin",
+    email: "ActionPublicAdj@gmail.com",
+    phone: "",
+    role: "Administrator",
+    timezone: "America/New_York",
+    notificationEmail: "ActionPublicAdj@gmail.com",
+  };
+}
+
+async function readAdminProfileFallback() {
+  try {
+    return JSON.parse(await fs.readFile(ADMIN_PROFILE_FILE, "utf8"));
+  } catch (error) {
+    return defaultAdminProfile();
+  }
+}
+
+function normalizeAdminProfile(profile) {
+  return {
+    ...defaultAdminProfile(),
+    ...profile,
+  };
+}
+
+async function getAdminProfile() {
+  const stored = await kvRequest(["GET", ADMIN_PROFILE_KEY]);
+
+  if (stored) {
+    return normalizeAdminProfile(JSON.parse(stored));
+  }
+
+  return normalizeAdminProfile(await readAdminProfileFallback());
+}
+
+async function saveAdminProfile(profile) {
+  const nextProfile = normalizeAdminProfile(profile);
+  const saved = await kvRequest(["SET", ADMIN_PROFILE_KEY, JSON.stringify(nextProfile)]);
+
+  if (saved === null) {
+    await fs.writeFile(ADMIN_PROFILE_FILE, JSON.stringify(nextProfile, null, 2));
+  }
+
+  return nextProfile;
+}
+
 module.exports = {
   createAdminToken,
   createClaim,
+  createPortalCode,
   getAdminUsername,
+  getAdminProfile,
   listClaims,
+  normalizeClaim,
   readBody,
   requireAdmin,
   saveClaims,
+  saveAdminProfile,
   sendJson,
   validateSpamCheck,
   validateClaim,

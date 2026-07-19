@@ -21,7 +21,7 @@ html {
 body {
   margin: 0;
   color: var(--ink);
-  font-family: "Montserrat", Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
   background: var(--cloud);
 }
 
@@ -152,23 +152,23 @@ h1,
 h2,
 h3 {
   margin: 0;
-  line-height: 0.95;
-  font-family: "Bebas Neue", Impact, sans-serif;
-  font-weight: 400;
+  line-height: 1.06;
+  font-family: "Inter", Arial, sans-serif;
+  font-weight: 800;
   letter-spacing: 0;
 }
 
 h1 {
-  max-width: 580px;
-  font-size: clamp(58px, 9vw, 116px);
+  max-width: 680px;
+  font-size: clamp(42px, 6.2vw, 82px);
 }
 
 h2 {
-  font-size: clamp(42px, 5.2vw, 72px);
+  font-size: clamp(34px, 4.2vw, 56px);
 }
 
 h3 {
-  font-size: 30px;
+  font-size: 24px;
 }
 
 .hero p:not(.eyebrow) {
@@ -233,8 +233,9 @@ h3 {
   padding: 12px;
   border-right: 1px solid var(--line);
   color: var(--white);
-  font-family: "Bebas Neue", Impact, sans-serif;
-  font-size: 24px;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
   text-align: center;
   text-transform: uppercase;
 }
@@ -261,9 +262,9 @@ h3 {
 }
 
 .trust-bar strong {
-  font-family: "Bebas Neue", Impact, sans-serif;
-  font-size: 28px;
-  font-weight: 400;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 800;
 }
 
 .trust-bar span {
@@ -368,7 +369,9 @@ h3 {
   border: 1px solid rgba(8, 29, 51, 0.12);
   border-radius: 8px;
   background: var(--cloud);
-  box-shadow: 0 14px 36px rgba(8, 29, 51, 0.08);
+  box-shadow:
+    0 18px 42px rgba(8, 29, 51, 0.14),
+    0 6px 14px rgba(8, 29, 51, 0.08);
 }
 
 .service-card.is-dark {
@@ -376,6 +379,9 @@ h3 {
     linear-gradient(145deg, rgba(15, 76, 129, 0.76), rgba(8, 29, 51, 0.98)),
     var(--ink);
   color: var(--white);
+  box-shadow:
+    0 22px 46px rgba(8, 29, 51, 0.22),
+    0 8px 18px rgba(8, 29, 51, 0.12);
 }
 
 .service-card p {
@@ -424,8 +430,9 @@ h3 {
   display: grid;
   place-items: center;
   color: var(--cyan);
-  font-family: "Bebas Neue", Impact, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
   font-size: 28px;
+  font-weight: 900;
 }
 
 .fire-icon::before {
@@ -541,9 +548,9 @@ h3 {
 }
 
 .feature-list strong {
-  font-family: "Bebas Neue", Impact, sans-serif;
-  font-size: 32px;
-  font-weight: 400;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
 }
 
 .feature-list span {
@@ -650,8 +657,9 @@ button:disabled {
 
 .site-footer p {
   margin: 0;
-  font-family: "Bebas Neue", Impact, sans-serif;
-  font-size: 32px;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
 }
 
 .site-footer nav {
