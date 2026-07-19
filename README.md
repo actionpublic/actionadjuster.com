@@ -44,14 +44,17 @@ the claim record. Use proper object storage before production document handling.
 Set these Vercel environment variables before using the dashboard in production:
 
 ```text
-ADMIN_USERNAME=ilanR18
+ADMIN_USERNAME=IlanR18
 ADMIN_PASSWORD=choose-a-private-password
 ADMIN_TOKEN_SECRET=choose-a-long-random-secret
+RECAPTCHA_SITE_KEY=your-google-recaptcha-site-key
+RECAPTCHA_SECRET_KEY=your-google-recaptcha-secret-key
+BLOB_READ_WRITE_TOKEN=provided-by-vercel-blob
 ```
 
-Local development defaults to username `ilanR18` and password `!LoveHashem1836`.
+Local development defaults to username `IlanR18` and password `!LoveHashem1836`.
+Local development also uses Google's public reCAPTCHA test keys if no
+reCAPTCHA keys are configured.
 
-For persistent production storage, add Vercel KV to the project. Vercel will
-provide `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Without KV, local development
-uses a temporary file store and production serverless data is not guaranteed to
-persist.
+Production CRM data is stored in the connected private Vercel Blob store. Without
+`BLOB_READ_WRITE_TOKEN`, local development falls back to a temporary file store.

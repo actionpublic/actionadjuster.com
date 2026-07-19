@@ -594,6 +594,27 @@ h3 {
   grid-column: 1 / -1;
 }
 
+.captcha-field {
+  display: grid;
+  gap: 10px;
+  min-height: 84px;
+  align-content: start;
+}
+
+.captcha-field span {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.captcha-message {
+  margin: 0;
+  color: #ffb6b6;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .claim-form .bot-field {
   position: absolute;
   left: -9999px;

@@ -22,6 +22,7 @@ let currentView = "active";
 let currentCrmView = "inquiries";
 let currentClaims = [];
 let currentAdminProfile = null;
+let activeDetailTabs = {};
 
 function getToken() {
   return window.localStorage.getItem("actionAdjustersAdminToken");
@@ -514,6 +515,246 @@ function renderPortalOverview(claims) {
     .join("");
 }
 
+function renderDetailTabs(claim, tabs) {
+  const activeTab = tabs.some((tab) => tab.id === activeDetailTabs[claim.id])
+    ? activeDetailTabs[claim.id]
+    : tabs[0].id;
+
+  return `
+    <div class="claim-detail-tabs" role="tablist" aria-label="Claim detail sections">
+      ${tabs
+        .map(
+          (tab) => `
+            <button
+              type="button"
+              class="${tab.id === activeTab ? "is-active" : ""}"
+              data-detail-tab="${tab.id}"
+              role="tab"
+              aria-selected="${tab.id === activeTab ? "true" : "false"}"
+            >
+              ${escapeHtml(tab.label)}
+            </button>`
+        )
+        .join("")}
+    </div>
+    <div class="claim-tab-window">
+      ${tabs
+        .map(
+          (tab) => `
+            <section class="claim-tab-panel ${tab.id === activeTab ? "is-active" : ""}" data-detail-panel="${tab.id}" role="tabpanel">
+              ${tab.content}
+            </section>`
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function renderOverviewPanel(claim) {
+  return `
+    <div class="notification-detail-grid">
+      <section>
+        <h2>Contact</h2>
+        <p><span>Phone</span><a href="tel:${escapeHtml(claim.phone)}">${escapeHtml(claim.phone)}</a></p>
+        <p><span>Email</span><a href="mailto:${escapeHtml(claim.email)}">${escapeHtml(claim.email)}</a></p>
+      </section>
+      <section>
+        <h2>Claim</h2>
+        <p><span>Damage</span>${escapeHtml(claim.damage)}</p>
+        <p><span>Stage</span>${escapeHtml(claim.crmStage || "inquiry")}</p>
+        <p><span>Status</span>${escapeHtml(stageLabel(claim))}</p>
+        ${claim.followUpAt ? `<p><span>Follow Up</span>${escapeHtml(claim.followUpAt)}</p>` : ""}
+      </section>
+      <section class="message-panel">
+        <h2>Message</h2>
+        <p>${escapeHtml(claim.message)}</p>
+      </section>
+    </div>
+  `;
+}
+
+function renderWorkflowPanel(claim) {
+  return `
+    <div class="crm-workflow-panel">
+      <section>
+        <h2>CRM Workflow</h2>
+        <div class="crm-button-row">
+          ${claim.crmStage === "inquiry" ? `<button type="button" data-claim-action="promoteLead" data-claim-id="${claim.id}">Turn Into Lead</button>` : ""}
+          ${claim.crmStage === "lead" ? `<button type="button" data-claim-action="promoteClient" data-claim-id="${claim.id}">Turn Into Client</button>` : ""}
+          <span>${escapeHtml(stageLabel(claim))}</span>
+        </div>
+      </section>
+      <section>
+        <h2>Status & Follow Up</h2>
+        <div class="crm-form-grid">
+          <label>
+            Lead Status
+            <select data-lead-status>
+              ${["New Inquiry", "Contact Needed", "Contacted", "Inspection Scheduled", "Estimate Requested", "Waiting on Client", "Closed"].map(
+                (status) => `<option value="${status}" ${claim.leadStatus === status ? "selected" : ""}>${status}</option>`
+              ).join("")}
+            </select>
+          </label>
+          <label>
+            Client Status
+            <select data-client-status>
+              ${["", "Active Claim", "Documents Needed", "Submitted to Carrier", "Negotiating", "Settled", "Closed"].map(
+                (status) => `<option value="${status}" ${claim.clientStatus === status ? "selected" : ""}>${status || "Not a client yet"}</option>`
+              ).join("")}
+            </select>
+          </label>
+          <label>
+            Follow Up
+            <input type="date" data-follow-up value="${escapeHtml(claim.followUpAt || "")}" />
+          </label>
+          <button type="button" data-claim-action="crm" data-claim-id="${claim.id}">Save CRM</button>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderPortalPanel(claim) {
+  if (claim.crmStage !== "client") {
+    return `<div class="tab-empty-state">Turn this inquiry into a client to enable portal access and client profile settings.</div>`;
+  }
+
+  return `
+    <div class="crm-workflow-panel">
+      <section>
+        <h2>Client Portal</h2>
+        <p>Portal code: <strong>${escapeHtml(claim.portalCode)}</strong></p>
+        <p>Portal access is ${claim.portalEnabled ? "enabled" : "disabled"}.</p>
+        <div class="crm-button-row">
+          <button type="button" data-claim-action="portal" data-portal-enabled="${claim.portalEnabled ? "false" : "true"}" data-claim-id="${claim.id}">
+            ${claim.portalEnabled ? "Disable Portal" : "Enable Portal"}
+          </button>
+          <button type="button" data-claim-action="resetPortalCode" data-claim-id="${claim.id}">Reset Code</button>
+          <a
+            class="crm-link-button"
+            href="mailto:${encodeURIComponent(claim.clientProfile?.email || claim.email || "")}?subject=${encodeURIComponent("Your Action Adjusters client portal code")}&body=${encodeURIComponent(`Hello ${claim.clientProfile?.displayName || claim.name || ""},\n\nYour Action Adjusters client portal is ready.\n\nPortal link: ${window.location.origin}/portal/\nPortal code: ${claim.portalCode}\n\nUse the email address on file to sign in.\n\nAction Adjusters`)}"
+          >
+            Email Code
+          </a>
+        </div>
+      </section>
+      <section class="client-profile-section">
+        <h2>Client User Profile</h2>
+        <div class="profile-form-grid compact">
+          <label>
+            Display Name
+            <input type="text" data-client-profile="displayName" value="${escapeHtml(claim.clientProfile?.displayName || claim.name || "")}" />
+          </label>
+          <label>
+            Email
+            <input type="email" data-client-profile="email" value="${escapeHtml(claim.clientProfile?.email || claim.email || "")}" />
+          </label>
+          <label>
+            Phone
+            <input type="text" data-client-profile="phone" value="${escapeHtml(claim.clientProfile?.phone || claim.phone || "")}" />
+          </label>
+          <label>
+            Preferred Contact
+            <select data-client-profile="preferredContact">
+              ${["Phone", "Email", "Text"].map(
+                (option) => `<option value="${option}" ${(claim.clientProfile?.preferredContact || "Phone") === option ? "selected" : ""}>${option}</option>`
+              ).join("")}
+            </select>
+          </label>
+          <label>
+            Portal Role
+            <input type="text" data-client-profile="portalRole" value="${escapeHtml(claim.clientProfile?.portalRole || "Client")}" />
+          </label>
+          <label class="wide">
+            Mailing Address
+            <input type="text" data-client-profile="mailingAddress" value="${escapeHtml(claim.clientProfile?.mailingAddress || "")}" />
+          </label>
+          <label>
+            City
+            <input type="text" data-client-profile="city" value="${escapeHtml(claim.clientProfile?.city || "")}" />
+          </label>
+          <label>
+            State
+            <input type="text" data-client-profile="state" value="${escapeHtml(claim.clientProfile?.state || "")}" />
+          </label>
+          <label>
+            ZIP
+            <input type="text" data-client-profile="zip" value="${escapeHtml(claim.clientProfile?.zip || "")}" />
+          </label>
+          <label class="wide">
+            Portal Notes
+            <textarea rows="3" data-client-profile="portalNotes" placeholder="Private portal/profile notes...">${escapeHtml(claim.clientProfile?.portalNotes || "")}</textarea>
+          </label>
+        </div>
+        <button type="button" data-claim-action="clientProfile" data-claim-id="${claim.id}">Save Client Profile</button>
+      </section>
+    </div>
+  `;
+}
+
+function renderUpdatesDocumentsPanel(claim) {
+  if (claim.crmStage !== "client") {
+    return `<div class="tab-empty-state">Documents and client-visible updates are available after this inquiry becomes a client.</div>`;
+  }
+
+  return `
+    <div class="crm-workflow-panel">
+      <section>
+        <h2>Updates</h2>
+        <textarea data-update rows="3" placeholder="Add a claim update..."></textarea>
+        <label class="checkbox-row"><input type="checkbox" data-update-visible checked /> Show in client portal</label>
+        <button type="button" data-claim-action="update" data-claim-id="${claim.id}">Add Update</button>
+        <div class="mini-list">
+          ${(claim.updates || []).slice(0, 3).map((update) => `<p>${escapeHtml(update.text)}</p>`).join("") || "<p>No updates yet.</p>"}
+        </div>
+      </section>
+      <section>
+        <h2>Documents</h2>
+        <input type="file" data-document-file />
+        <label class="checkbox-row"><input type="checkbox" data-document-visible checked /> Show in client portal</label>
+        <button type="button" data-claim-action="document" data-claim-id="${claim.id}">Upload Document</button>
+        <div class="mini-list">
+          ${(claim.documents || []).slice(0, 3).map((document) => `<p><a href="${escapeHtml(document.dataUrl)}" download="${escapeHtml(document.name)}">${escapeHtml(document.name)}</a></p>`).join("") || "<p>No documents yet.</p>"}
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderActivityPanel(claim) {
+  return `
+    <section class="activity-log">
+      <h2>Activity Log</h2>
+      ${renderActivityLog(claim)}
+    </section>
+  `;
+}
+
+function renderNotesPanel(claim) {
+  return `
+    <div class="internal-notes">
+      <label>
+        Internal notes
+        <textarea data-notes rows="4" placeholder="Add private admin notes for this claim...">${escapeHtml(claim.internalNotes || "")}</textarea>
+      </label>
+      <button type="button" data-claim-action="notes" data-claim-id="${claim.id}">Save Notes</button>
+    </div>
+  `;
+}
+
+function renderClaimDetails(claim) {
+  const tabs = [
+    { id: "overview", label: "Overview", content: renderOverviewPanel(claim) },
+    { id: "workflow", label: "Workflow", content: renderWorkflowPanel(claim) },
+    { id: "portal", label: "Portal/Profile", content: renderPortalPanel(claim) },
+    { id: "updates", label: "Updates/Docs", content: renderUpdatesDocumentsPanel(claim) },
+    { id: "activity", label: "Activity", content: renderActivityPanel(claim) },
+    { id: "notes", label: "Notes", content: renderNotesPanel(claim) },
+  ];
+
+  return renderDetailTabs(claim, tabs);
+}
+
 function renderClaims(claims) {
   adminTitle.textContent = crmViewTitle();
   setTotalNotifications(claims.length);
@@ -527,7 +768,7 @@ function renderClaims(claims) {
   const rows = claims
     .map(
       (claim) => `
-        <article class="notification-card ${claim.status === "completed" ? "is-completed" : ""}" tabindex="0" data-claim-card aria-expanded="false">
+        <article class="notification-card ${claim.status === "completed" ? "is-completed" : ""}" tabindex="0" data-claim-card data-claim-id="${escapeHtml(claim.id)}" aria-expanded="false">
           <div class="notification-summary">
             <div class="notification-field">
               <span>Name</span>
@@ -591,174 +832,7 @@ function renderClaims(claims) {
             </div>
           </div>
           <div class="notification-details">
-            <div class="notification-detail-grid">
-              <section>
-                <h2>Contact</h2>
-                <p><span>Phone</span><a href="tel:${escapeHtml(claim.phone)}">${escapeHtml(claim.phone)}</a></p>
-                <p><span>Email</span><a href="mailto:${escapeHtml(claim.email)}">${escapeHtml(claim.email)}</a></p>
-              </section>
-              <section>
-                <h2>Claim</h2>
-                <p><span>Damage</span>${escapeHtml(claim.damage)}</p>
-                <p><span>Stage</span>${escapeHtml(claim.crmStage || "inquiry")}</p>
-                <p><span>Status</span>${escapeHtml(stageLabel(claim))}</p>
-                ${
-                  claim.followUpAt
-                    ? `<p><span>Follow Up</span>${escapeHtml(claim.followUpAt)}</p>`
-                    : ""
-                }
-              </section>
-              <section class="message-panel">
-                <h2>Message</h2>
-                <p>${escapeHtml(claim.message)}</p>
-              </section>
-            </div>
-            <div class="crm-workflow-panel">
-              <section>
-                <h2>CRM Workflow</h2>
-                <div class="crm-button-row">
-                  ${
-                    claim.crmStage === "inquiry"
-                      ? `<button type="button" data-claim-action="promoteLead" data-claim-id="${claim.id}">Turn Into Lead</button>`
-                      : ""
-                  }
-                  ${
-                    claim.crmStage === "lead"
-                      ? `<button type="button" data-claim-action="promoteClient" data-claim-id="${claim.id}">Turn Into Client</button>`
-                      : ""
-                  }
-                  <span>${escapeHtml(stageLabel(claim))}</span>
-                </div>
-              </section>
-              <section>
-                <h2>Status & Follow Up</h2>
-                <div class="crm-form-grid">
-                  <label>
-                    Lead Status
-                    <select data-lead-status>
-                      ${["New Inquiry", "Contact Needed", "Contacted", "Inspection Scheduled", "Estimate Requested", "Waiting on Client", "Closed"].map(
-                        (status) => `<option value="${status}" ${claim.leadStatus === status ? "selected" : ""}>${status}</option>`
-                      ).join("")}
-                    </select>
-                  </label>
-                  <label>
-                    Client Status
-                    <select data-client-status>
-                      ${["", "Active Claim", "Documents Needed", "Submitted to Carrier", "Negotiating", "Settled", "Closed"].map(
-                        (status) => `<option value="${status}" ${claim.clientStatus === status ? "selected" : ""}>${status || "Not a client yet"}</option>`
-                      ).join("")}
-                    </select>
-                  </label>
-                  <label>
-                    Follow Up
-                    <input type="date" data-follow-up value="${escapeHtml(claim.followUpAt || "")}" />
-                  </label>
-                  <button type="button" data-claim-action="crm" data-claim-id="${claim.id}">Save CRM</button>
-                </div>
-              </section>
-              ${
-                claim.crmStage === "client"
-                  ? `<section>
-                      <h2>Client Portal</h2>
-                      <p>Portal code: <strong>${escapeHtml(claim.portalCode)}</strong></p>
-                      <p>Portal access is ${claim.portalEnabled ? "enabled" : "disabled"}.</p>
-                      <div class="crm-button-row">
-                        <button type="button" data-claim-action="portal" data-portal-enabled="${claim.portalEnabled ? "false" : "true"}" data-claim-id="${claim.id}">
-                          ${claim.portalEnabled ? "Disable Portal" : "Enable Portal"}
-                        </button>
-                        <button type="button" data-claim-action="resetPortalCode" data-claim-id="${claim.id}">
-                          Reset Code
-                        </button>
-                        <a
-                          class="crm-link-button"
-                          href="mailto:${encodeURIComponent(claim.clientProfile?.email || claim.email || "")}?subject=${encodeURIComponent("Your Action Adjusters client portal code")}&body=${encodeURIComponent(`Hello ${claim.clientProfile?.displayName || claim.name || ""},\n\nYour Action Adjusters client portal is ready.\n\nPortal link: ${window.location.origin}/portal/\nPortal code: ${claim.portalCode}\n\nUse the email address on file to sign in.\n\nAction Adjusters`)}"
-                        >
-                          Email Code
-                        </a>
-                      </div>
-                    </section>
-                    <section class="client-profile-section">
-                      <h2>Client User Profile</h2>
-                      <div class="profile-form-grid compact">
-                        <label>
-                          Display Name
-                          <input type="text" data-client-profile="displayName" value="${escapeHtml(claim.clientProfile?.displayName || claim.name || "")}" />
-                        </label>
-                        <label>
-                          Email
-                          <input type="email" data-client-profile="email" value="${escapeHtml(claim.clientProfile?.email || claim.email || "")}" />
-                        </label>
-                        <label>
-                          Phone
-                          <input type="text" data-client-profile="phone" value="${escapeHtml(claim.clientProfile?.phone || claim.phone || "")}" />
-                        </label>
-                        <label>
-                          Preferred Contact
-                          <select data-client-profile="preferredContact">
-                            ${["Phone", "Email", "Text"].map(
-                              (option) => `<option value="${option}" ${(claim.clientProfile?.preferredContact || "Phone") === option ? "selected" : ""}>${option}</option>`
-                            ).join("")}
-                          </select>
-                        </label>
-                        <label>
-                          Portal Role
-                          <input type="text" data-client-profile="portalRole" value="${escapeHtml(claim.clientProfile?.portalRole || "Client")}" />
-                        </label>
-                        <label class="wide">
-                          Mailing Address
-                          <input type="text" data-client-profile="mailingAddress" value="${escapeHtml(claim.clientProfile?.mailingAddress || "")}" />
-                        </label>
-                        <label>
-                          City
-                          <input type="text" data-client-profile="city" value="${escapeHtml(claim.clientProfile?.city || "")}" />
-                        </label>
-                        <label>
-                          State
-                          <input type="text" data-client-profile="state" value="${escapeHtml(claim.clientProfile?.state || "")}" />
-                        </label>
-                        <label>
-                          ZIP
-                          <input type="text" data-client-profile="zip" value="${escapeHtml(claim.clientProfile?.zip || "")}" />
-                        </label>
-                        <label class="wide">
-                          Portal Notes
-                          <textarea rows="3" data-client-profile="portalNotes" placeholder="Private portal/profile notes...">${escapeHtml(claim.clientProfile?.portalNotes || "")}</textarea>
-                        </label>
-                      </div>
-                      <button type="button" data-claim-action="clientProfile" data-claim-id="${claim.id}">Save Client Profile</button>
-                    </section>
-                    <section>
-                      <h2>Updates</h2>
-                      <textarea data-update rows="3" placeholder="Add a claim update..."></textarea>
-                      <label class="checkbox-row"><input type="checkbox" data-update-visible checked /> Show in client portal</label>
-                      <button type="button" data-claim-action="update" data-claim-id="${claim.id}">Add Update</button>
-                      <div class="mini-list">
-                        ${(claim.updates || []).slice(0, 3).map((update) => `<p>${escapeHtml(update.text)}</p>`).join("") || "<p>No updates yet.</p>"}
-                      </div>
-                    </section>
-                    <section>
-                      <h2>Documents</h2>
-                      <input type="file" data-document-file />
-                      <label class="checkbox-row"><input type="checkbox" data-document-visible checked /> Show in client portal</label>
-                      <button type="button" data-claim-action="document" data-claim-id="${claim.id}">Upload Document</button>
-                      <div class="mini-list">
-                        ${(claim.documents || []).slice(0, 3).map((document) => `<p><a href="${escapeHtml(document.dataUrl)}" download="${escapeHtml(document.name)}">${escapeHtml(document.name)}</a></p>`).join("") || "<p>No documents yet.</p>"}
-                      </div>
-                    </section>`
-                  : ""
-              }
-            </div>
-            <section class="activity-log">
-              <h2>Activity Log</h2>
-              ${renderActivityLog(claim)}
-            </section>
-            <div class="internal-notes">
-              <label>
-                Internal notes
-                <textarea data-notes rows="4" placeholder="Add private admin notes for this claim...">${escapeHtml(claim.internalNotes || "")}</textarea>
-              </label>
-              <button type="button" data-claim-action="notes" data-claim-id="${claim.id}">Save Notes</button>
-            </div>
+            ${renderClaimDetails(claim)}
           </div>
         </article>
       `
@@ -916,6 +990,29 @@ notificationList.addEventListener("click", async (event) => {
     return;
   }
 
+  const detailTabButton = event.target.closest("[data-detail-tab]");
+
+  if (detailTabButton) {
+    const card = detailTabButton.closest("[data-claim-card]");
+    const selectedTab = detailTabButton.dataset.detailTab;
+
+    if (card && selectedTab) {
+      activeDetailTabs[card.dataset.claimId] = selectedTab;
+
+      card.querySelectorAll("[data-detail-tab]").forEach((tabButton) => {
+        const isActive = tabButton.dataset.detailTab === selectedTab;
+        tabButton.classList.toggle("is-active", isActive);
+        tabButton.setAttribute("aria-selected", String(isActive));
+      });
+
+      card.querySelectorAll("[data-detail-panel]").forEach((panel) => {
+        panel.classList.toggle("is-active", panel.dataset.detailPanel === selectedTab);
+      });
+    }
+
+    return;
+  }
+
   const button = event.target.closest("[data-claim-action]");
 
   if (button) {
@@ -998,7 +1095,7 @@ notificationList.addEventListener("click", async (event) => {
     return;
   }
 
-  if (event.target.closest("a, input, textarea, select")) {
+  if (event.target.closest("a, button, input, textarea, select")) {
     return;
   }
 

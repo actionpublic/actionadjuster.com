@@ -270,10 +270,11 @@
             What happened?
             <textarea name="message" rows="5" required></textarea>
           </label>
-          <label>
-            Security check: 4 + 3 =
-            <input name="captcha" type="text" inputmode="numeric" autocomplete="off" required />
-          </label>
+          <div class="captcha-field full" data-recaptcha-container>
+            <span>Security check</span>
+            <div data-recaptcha-widget></div>
+            <input name="recaptchaToken" type="hidden" data-recaptcha-response required />
+          </div>
           <label class="bot-field" aria-hidden="true">
             Website
             <input name="website" type="text" tabindex="-1" autocomplete="off" />

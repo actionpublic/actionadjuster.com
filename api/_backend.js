@@ -9,12 +9,16 @@ const ADMIN_PROFILE_KEY = "action-adjusters:admin-profile";
 const CLAIMS_BLOB_PATH = "action-adjusters/claims.json";
 const ADMIN_PROFILE_BLOB_PATH = "action-adjusters/admin-profile.json";
 const MAX_CLAIMS = 250;
+const LOCAL_RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
+const LOCAL_RECAPTCHA_SECRET = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe";
 const FALLBACK_FILE = path.join(os.tmpdir(), "action-adjusters-claims.json");
 const ADMIN_PROFILE_FILE = path.join(os.tmpdir(), "action-adjusters-admin-profile.json");
 const ALLOWED_ORIGINS = new Set([
   "https://www.actionadjusters.com",
   "https://actionadjusters.com",
   "https://files-mentioned-by-the-user-4a31b83.vercel.app",
+  "http://localhost:8768",
+  "http://127.0.0.1:8768",
 ]);
 
 function createPortalCode() {
@@ -151,13 +155,52 @@ function normalizeClaims(claims) {
   return claims.map(normalizeClaim);
 }
 
-function validateSpamCheck(input) {
+function getRecaptchaSiteKey() {
+  if (process.env.RECAPTCHA_SITE_KEY) {
+    return process.env.RECAPTCHA_SITE_KEY;
+  }
+
+  return process.env.NODE_ENV === "production" ? "" : LOCAL_RECAPTCHA_SITE_KEY;
+}
+
+function getRecaptchaSecret() {
+  if (process.env.RECAPTCHA_SECRET_KEY) {
+    return process.env.RECAPTCHA_SECRET_KEY;
+  }
+
+  return process.env.NODE_ENV === "production" ? "" : LOCAL_RECAPTCHA_SECRET;
+}
+
+async function validateSpamCheck(input) {
   if (cleanText(input.website, 300)) {
     return "Submission blocked.";
   }
 
-  if (cleanText(input.captcha, 20) !== "7") {
-    return "Security check answer is incorrect.";
+  const token = cleanText(input.recaptchaToken, 4000);
+  const secret = getRecaptchaSecret();
+
+  if (!secret) {
+    return "Google reCAPTCHA is not configured.";
+  }
+
+  if (!token) {
+    return "Google reCAPTCHA is required.";
+  }
+
+  const verification = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      secret,
+      response: token,
+    }),
+  });
+  const data = await verification.json().catch(() => ({}));
+
+  if (!verification.ok || !data.success) {
+    return "Google reCAPTCHA verification failed.";
   }
 
   return "";
@@ -176,7 +219,7 @@ function getAdminUsername() {
     return process.env.ADMIN_USERNAME;
   }
 
-  return process.env.NODE_ENV === "production" ? "" : "ilanR18";
+  return process.env.NODE_ENV === "production" ? "" : "IlanR18";
 }
 
 function getTokenSecret() {
@@ -377,6 +420,7 @@ module.exports = {
   createClaim,
   createPortalCode,
   getAdminUsername,
+  getRecaptchaSiteKey,
   getAdminProfile,
   listClaims,
   normalizeClaim,

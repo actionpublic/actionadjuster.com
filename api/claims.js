@@ -36,7 +36,7 @@ module.exports = async function handler(request, response) {
     if (request.method === "POST") {
       const body = await readBody(request);
       const claim = createClaim(body);
-      const error = validateClaim(claim) || validateSpamCheck(body);
+      const error = validateClaim(claim) || (await validateSpamCheck(body));
 
       if (error) {
         sendJson(response, 400, { error });
