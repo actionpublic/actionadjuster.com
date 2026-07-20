@@ -5,6 +5,7 @@ const recaptchaWidget = document.querySelector("[data-recaptcha-widget]");
 const recaptchaResponse = document.querySelector("[data-recaptcha-response]");
 const CANONICAL_API_ORIGIN = "https://files-mentioned-by-the-user-4a31b83.vercel.app";
 let recaptchaWidgetId = null;
+let recaptchaConfig = null;
 
 function getClaimsApiUrl() {
   if (window.location.hostname.endsWith("actionadjusters.com")) {
@@ -30,8 +31,8 @@ function getConfigApiUrl() {
   return "/api/site-config";
 }
 
-function loadRecaptchaApi() {
-  if (window.grecaptcha?.render) {
+function loadRecaptchaApi(config) {
+  if (window.grecaptcha?.render || window.grecaptcha?.execute) {
     return Promise.resolve();
   }
 
@@ -39,11 +40,31 @@ function loadRecaptchaApi() {
     window.onActionAdjustersRecaptchaLoad = resolve;
 
     const script = document.createElement("script");
-    script.src = "https://www.google.com/recaptcha/api.js?onload=onActionAdjustersRecaptchaLoad&render=explicit";
+    const renderMode = config.recaptchaType === "v3" ? encodeURIComponent(config.recaptchaSiteKey) : "explicit";
+    script.src = `https://www.google.com/recaptcha/api.js?onload=onActionAdjustersRecaptchaLoad&render=${renderMode}`;
     script.async = true;
     script.defer = true;
     script.onerror = () => reject(new Error("Could not load Google reCAPTCHA."));
     document.head.appendChild(script);
+  });
+}
+
+function executeRecaptcha() {
+  if (!recaptchaConfig || !window.grecaptcha) {
+    return Promise.resolve("");
+  }
+
+  if (recaptchaConfig.recaptchaType !== "v3") {
+    return Promise.resolve(recaptchaResponse?.value || "");
+  }
+
+  return new Promise((resolve, reject) => {
+    window.grecaptcha.ready(() => {
+      window.grecaptcha
+        .execute(recaptchaConfig.recaptchaSiteKey, { action: "claim_review" })
+        .then(resolve)
+        .catch(() => reject(new Error("Could not verify Google reCAPTCHA.")));
+    });
   });
 }
 
@@ -60,9 +81,20 @@ async function setupRecaptcha() {
       throw new Error(config.error || "Google reCAPTCHA is not configured.");
     }
 
-    await loadRecaptchaApi();
+    recaptchaConfig = {
+      recaptchaSiteKey: config.recaptchaSiteKey,
+      recaptchaType: config.recaptchaType === "v3" ? "v3" : "v2",
+    };
+
+    await loadRecaptchaApi(recaptchaConfig);
+
+    if (recaptchaConfig.recaptchaType === "v3") {
+      recaptchaWidget.innerHTML = `<p class="captcha-message">Protected by Google reCAPTCHA.</p>`;
+      return;
+    }
+
     recaptchaWidgetId = window.grecaptcha.render(recaptchaWidget, {
-      sitekey: config.recaptchaSiteKey,
+      sitekey: recaptchaConfig.recaptchaSiteKey,
       callback: (token) => {
         recaptchaResponse.value = token;
       },
@@ -87,7 +119,7 @@ nav?.querySelectorAll("a").forEach((link) => {
   });
 });
 
-claimForm?.addEventListener("submit", (event) => {
+claimForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const formData = new FormData(claimForm);
@@ -101,15 +133,25 @@ claimForm?.addEventListener("submit", (event) => {
     return;
   }
 
-  if (!payload.recaptchaToken) {
-    status.textContent = "Complete the Google reCAPTCHA before sending.";
-    status.className = "form-status full is-error";
-    return;
-  }
-
   status.textContent = "Sending claim review...";
   status.className = "form-status full";
   submitButton.disabled = true;
+
+  try {
+    const recaptchaToken = await executeRecaptcha();
+
+    if (!recaptchaToken) {
+      throw new Error("Complete the Google reCAPTCHA before sending.");
+    }
+
+    payload.recaptchaToken = recaptchaToken;
+    recaptchaResponse.value = recaptchaToken;
+  } catch (error) {
+    status.textContent = error.message || "Could not verify Google reCAPTCHA.";
+    status.classList.add("is-error");
+    submitButton.disabled = false;
+    return;
+  }
 
   fetch(getClaimsApiUrl(), {
     method: "POST",
@@ -127,7 +169,7 @@ claimForm?.addEventListener("submit", (event) => {
 
       claimForm.reset();
       recaptchaResponse.value = "";
-      if (window.grecaptcha && recaptchaWidgetId !== null) {
+      if (recaptchaConfig?.recaptchaType !== "v3" && window.grecaptcha && recaptchaWidgetId !== null) {
         window.grecaptcha.reset(recaptchaWidgetId);
       }
       status.textContent = "Claim review sent. The admin dashboard has a new notification.";

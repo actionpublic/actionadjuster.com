@@ -1,4 +1,4 @@
-const { applyCors, getRecaptchaSiteKey, sendJson } = require("./_backend");
+const { applyCors, getRecaptchaSiteKey, getRecaptchaType, sendJson } = require("./_backend");
 
 module.exports = async function handler(request, response) {
   applyCors(request, response);
@@ -22,5 +22,5 @@ module.exports = async function handler(request, response) {
     return;
   }
 
-  sendJson(response, 200, { recaptchaSiteKey });
+  sendJson(response, 200, { recaptchaSiteKey, recaptchaType: getRecaptchaType() });
 };

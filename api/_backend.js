@@ -171,6 +171,10 @@ function getRecaptchaSecret() {
   return process.env.NODE_ENV === "production" ? "" : LOCAL_RECAPTCHA_SECRET;
 }
 
+function getRecaptchaType() {
+  return String(process.env.RECAPTCHA_TYPE || (process.env.NODE_ENV === "production" ? "v3" : "v2")).trim().toLowerCase();
+}
+
 async function validateSpamCheck(input) {
   if (cleanText(input.website, 300)) {
     return "Submission blocked.";
@@ -201,6 +205,19 @@ async function validateSpamCheck(input) {
 
   if (!verification.ok || !data.success) {
     return "Google reCAPTCHA verification failed.";
+  }
+
+  if (getRecaptchaType() === "v3") {
+    const expectedAction = "claim_review";
+    const minimumScore = Number(process.env.RECAPTCHA_MIN_SCORE || 0.5);
+
+    if (data.action && data.action !== expectedAction) {
+      return "Google reCAPTCHA verification failed.";
+    }
+
+    if (typeof data.score === "number" && data.score < minimumScore) {
+      return "Submission blocked by Google reCAPTCHA.";
+    }
   }
 
   return "";
@@ -421,6 +438,7 @@ module.exports = {
   createPortalCode,
   getAdminUsername,
   getRecaptchaSiteKey,
+  getRecaptchaType,
   getAdminProfile,
   listClaims,
   normalizeClaim,
